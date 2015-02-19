@@ -27,7 +27,7 @@ def test_author():
     'foo'
     >>> modifier.get_committer_env()['GIT_COMMITTER_EMAIL']
     'bar'
-    >>> modifier._get_env('foo')
+    >>> modifier._get_env('foo') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitModifierError: Neither committer nor author
