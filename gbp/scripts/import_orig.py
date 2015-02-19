@@ -129,19 +129,19 @@ def find_source(use_uscan, args):
     @rtype: string
     @raise GbpError: raised on all detected errors
 
-    >>> find_source(False, ['too', 'much'])
+    >>> find_source(False, ['too', 'much']) # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GbpError: More than one archive specified. Try --help.
-    >>> find_source(False, [])
+    >>> find_source(False, []) # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GbpError: No archive to import specified. Try --help.
-    >>> find_source(True, ['tarball'])
+    >>> find_source(True, ['tarball']) # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GbpError: you can't pass both --uscan and a filename.
-    >>> find_source(False, ['tarball']).path
+    >>> find_source(False, ['tarball']).path # doctest:+IGNORE_EXCEPTION_DETAIL
     'tarball'
     """
     if use_uscan:
