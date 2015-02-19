@@ -152,7 +152,7 @@ def test_delete_branch():
     >>> repo = gbp.git.GitRepository(repo_dir)
     >>> repo.create_branch("bar")
     >>> repo.delete_branch("bar")
-    >>> repo.delete_branch("master")
+    >>> repo.delete_branch("master") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Can't delete the branch you're on
@@ -208,10 +208,10 @@ def test_set_upstream_branch():
     >>> repo.set_upstream_branch('master', 'origin/master')
     >>> repo.get_upstream_branch('master')
     'origin/master'
-    >>> repo.set_upstream_branch('bla', 'origin/master')
+    >>> repo.set_upstream_branch('bla', 'origin/master') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     GitRepositoryError: Branch bla doesn't exist!
-    >>> repo.set_upstream_branch('foo', 'origin/bla')
+    >>> repo.set_upstream_branch('foo', 'origin/bla') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     GitRepositoryError: Branch origin/bla doesn't exist!
     """
@@ -226,7 +226,7 @@ def test_get_upstream_branch():
     'origin/master'
     >>> repo.get_upstream_branch('foo')
     ''
-    >>> repo.get_upstream_branch('bla')
+    >>> repo.get_upstream_branch('bla') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     GitRepositoryError: Branch bla doesn't exist!
     """
@@ -273,7 +273,7 @@ def test_describe():
     'tag2'
     >>> repo.describe('HEAD', longfmt=True) == 'tag2-0-g%s' % sha[:7]
     True
-    >>> repo.describe('HEAD', pattern='foo*')
+    >>> repo.describe('HEAD', pattern='foo*') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Can't describe HEAD. Git error: fatal: No names found, cannot describe anything.
@@ -303,7 +303,7 @@ def test_find_tag():
     >>> repo = gbp.git.GitRepository(repo_dir)
     >>> repo.find_tag('HEAD')
     'tag2'
-    >>> repo.find_tag('HEAD', pattern='foo*')
+    >>> repo.find_tag('HEAD', pattern='foo*') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Can't describe HEAD. Git error: fatal: No names found, cannot describe anything.
@@ -411,7 +411,7 @@ def test_list_files():
     >>> repo.commit_staged(msg="foo")
     >>> repo.list_files(['modified'])
     []
-    >>> repo.list_files(['foo'])
+    >>> repo.list_files(['foo']) # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Unknown type 'foo'
@@ -714,7 +714,7 @@ def test_nonexistant():
          - L{gbp.git.GitRepository.__init__}
 
     >>> import gbp.git
-    >>> bare = gbp.git.GitRepository("/does/not/exist")
+    >>> bare = gbp.git.GitRepository("/does/not/exist") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: No Git repository at '/does/not/exist'
@@ -728,7 +728,7 @@ def test_create_noperm():
          - L{gbp.git.GitRepository.create}
 
     >>> import gbp.git
-    >>> gbp.git.GitRepository.create("/does/not/exist")
+    >>> gbp.git.GitRepository.create("/does/not/exist") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Cannot create Git repository at '/does/not/exist': Permission denied
@@ -753,7 +753,7 @@ def test_checkout():
     >>> repo.checkout('master')
     >>> repo.branch
     'master'
-    >>> repo.rev_parse('doesnotexist')
+    >>> repo.rev_parse('doesnotexist') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: revision 'doesnotexist' not found
@@ -765,7 +765,7 @@ def test_checkout():
     40
     >>> repo.checkout(sha1)
     >>> repo.branch
-    >>> repo.get_branch()
+    >>> repo.get_branch() # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Currently not on a branch
@@ -802,7 +802,7 @@ def test_grep_log():
     True
     >>> repo.grep_log('blafasel')
     []
-    >>> repo.grep_log('foo', 'doesnotexist')
+    >>> repo.grep_log('foo', 'doesnotexist') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Error grepping log for foo: fatal: bad revision 'doesnotexist'
@@ -894,7 +894,7 @@ def test_get_merge_base():
     >>> sha1 = repo.get_merge_base('master', 'foo')
     >>> len(sha1)
     40
-    >>> repo.get_merge_base('master', 'doesnotexist')
+    >>> repo.get_merge_base('master', 'doesnotexist') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Failed to get common ancestor: fatal: Not a valid object name doesnotexist
@@ -941,7 +941,7 @@ def test_cmd_has_feature():
     True
     >>> repo._cmd_has_feature("merge", "foobaroption")
     False
-    >>> repo._cmd_has_feature("foobarcmd", "foobaroption")
+    >>> repo._cmd_has_feature("foobarcmd", "foobaroption") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Invalid git command 'foobarcmd': No manual entry for gitfoobarcmd
