@@ -320,7 +320,7 @@ def test_find_branch_tag():
     >>> repo = gbp.git.GitRepository(repo_dir)
     >>> repo.find_branch_tag('HEAD', 'master', 'tag*')
     'tag2'
-    >>> repo.find_branch_tag('HEAD', 'master', 'v*')   # doctest:+ELLIPSIS
+    >>> repo.find_branch_tag('HEAD', 'master', 'v*')  # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GitRepositoryError: Can't describe .... Git error: fatal: No names found, cannot describe anything.
