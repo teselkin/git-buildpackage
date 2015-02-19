@@ -91,19 +91,19 @@ def parse_url(remote_url, name, pkg, template_dir=None):
     >>> sort_dict(parse_url("ssh://host:22/~user/path/%(pkg)s.git", "origin", "package", "/doesnot/exist"))
     [('base', '~user/'), ('dir', 'path/package.git'), ('host', 'host'), ('name', 'origin'), ('pkg', 'package'), ('port', '22'), ('scheme', 'ssh'), ('template-dir', '/doesnot/exist'), ('url', 'ssh://host:22/~user/path/package.git')]
 
-    >>> parse_url("git://host/repo.git", "origin", "package")
+    >>> parse_url("git://host/repo.git", "origin", "package") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     GbpError: URL must use ssh protocol.
-    >>> parse_url("ssh://host/path/repo", "origin", "package")
+    >>> parse_url("ssh://host/path/repo", "origin", "package") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     GbpError: URL needs to contain either a repository name or '%(pkg)s'
-    >>> parse_url("ssh://host:asdf/path/%(pkg)s.git", "origin", "package")
+    >>> parse_url("ssh://host:asdf/path/%(pkg)s.git", "origin", "package") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     GbpError: URL contains invalid port.
-    >>> parse_url("ssh://host/~us er/path/%(pkg)s.git", "origin", "package")
+    >>> parse_url("ssh://host/~us er/path/%(pkg)s.git", "origin", "package") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     GbpError: URL contains invalid ~username expansion.
