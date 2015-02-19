@@ -35,7 +35,7 @@ class DebianSourceFormat(object):
     >>> d.type
     >>> d.version
     '1.0'
-    >>> d = DebianSourceFormat("1.0 broken")
+    >>> d = DebianSourceFormat("1.0 broken") # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     DebianSourceFormatError: Cannot get source format from '1.0 broken'

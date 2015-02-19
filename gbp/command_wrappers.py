@@ -131,7 +131,7 @@ class Command(object):
         @type quiet: C{bool}
 
         >>> Command("/bin/true")(["foo", "bar"])
-        >>> Command("/foo/bar")(quiet=True)
+        >>> Command("/foo/bar")(quiet=True)         # doctest:+IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         CommandExecFailed: '/foo/bar' failed: execution failed: [Errno 2] No such file or directory
@@ -166,6 +166,7 @@ class Command(object):
         >>> Command("/bin/true").call(["foo", "bar"])
         0
         >>> Command("/foo/bar").call(["foo", "bar"]) # doctest:+ELLIPSIS
+        ...                                          # doctest:+IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         CommandExecFailed: execution failed: ...
