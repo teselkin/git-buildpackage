@@ -28,6 +28,8 @@ from nose import SkipTest
 from nose.tools import eq_, ok_     # pylint: disable=E0611
 from .. testutils import GbpLogTester
 
+import six
+
 from  gbp.git import GitRepository, GitRepositoryError
 
 class ComponentTestGitRepository(GitRepository):
@@ -43,7 +45,7 @@ class ComponentTestGitRepository(GitRepository):
                                      err.strip())
         submodules = {}
         for line in out.splitlines():
-            module = line.strip()
+            module = line.decode('utf-8').strip()
             # Uninitialized
             status = module[0]
             if status == '-':
