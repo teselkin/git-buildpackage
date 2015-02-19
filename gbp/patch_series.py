@@ -68,12 +68,13 @@ class Patch(object):
                                 shell=True,
                                 stdout=subprocess.PIPE).stdout
         for line in pipe:
-            if ':' in line:
-                rfc_header, value = line.split(" ", 1)
+            l = line.decode('utf-8')
+            if ':' in l:
+                rfc_header, value = l.split(" ", 1)
                 header = rfc_header[:-1].lower()
                 self.info[header] = value.strip()
         try:
-            self.long_desc = "".join([line for line in body])
+            self.long_desc = "".join([line.decode('utf-8') for line in body])
             body.close()
         except IOError as msg:
             raise GbpError("Failed to read patch header of '%s': %s" %
