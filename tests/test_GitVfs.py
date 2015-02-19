@@ -47,9 +47,9 @@ def test_read():
     >>> gf.close()
     >>> gbp.git.vfs.GitVfs(repo, 'HEAD').open('foo.txt').read() == content
     True
-    >>> gf = vfs.open('doesnotexist')
+    >>> gf = vfs.open('doesnotexist') # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
-    IOError: can't get HEAD:doesnotexist: fatal: Path 'doesnotexist' does not exist in 'HEAD'
+    OSError: can't get HEAD:doesnotexist: fatal: Path 'doesnotexist' does not exist in 'HEAD'
     >>> context.teardown()
     """
