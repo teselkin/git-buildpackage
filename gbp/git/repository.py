@@ -912,7 +912,7 @@ class GitRepository(object):
 
         >>> GitRepository.strip_sha1('  58ef37dbeb12c44b206b92f746385a6f61253c0a\\n')
         '58ef37dbeb12c44b206b92f746385a6f61253c0a'
-        >>> GitRepository.strip_sha1('58ef37d', 10)
+        >>> GitRepository.strip_sha1('58ef37d', 10) # doctest:+IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         GitRepositoryError: '58ef37d' is not a valid sha1 of length 10
@@ -920,7 +920,7 @@ class GitRepository(object):
         '58ef37d'
         >>> GitRepository.strip_sha1('123456789', 7)
         '123456789'
-        >>> GitRepository.strip_sha1('foobar')
+        >>> GitRepository.strip_sha1('foobar') # doctest:+IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         GitRepositoryError: 'foobar' is not a valid sha1
