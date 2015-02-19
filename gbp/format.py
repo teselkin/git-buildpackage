@@ -23,11 +23,11 @@ def format_str(msg, args):
     Format a string with the given dict. Be a bit more verbose than
     default python about the error cause.
 
-    >>> format_str("%(foo)", {})
+    >>> format_str("%(foo)", {}) # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GbpError: Failed to format %(foo): Missing value 'foo' in {}
-    >>> format_str("%(foo)", {'foo': 'bar'})
+    >>> format_str("%(foo)", {'foo': 'bar'}) # doctest:+IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     GbpError: Failed to format %(foo) with {'foo': 'bar'}: incomplete format

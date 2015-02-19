@@ -50,7 +50,7 @@ class Uscan(object):
         '../virt-viewer_0.4.0.orig.tar.gz'
         >>> u.uptodate
         False
-        >>> u._parse('')
+        >>> u._parse('') # doctest:+IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         UscanError: Couldn't find 'upstream-url' in uscan output
@@ -139,17 +139,17 @@ class Uscan(object):
         >>> u._raise_error("<warnings>uscan warning: "
         ... "In watchfile debian/watch, reading webpage\n"
         ... "http://a.b/ failed: 500 Cant connect "
-        ... "to example.com:80 (Bad hostname)</warnings>")
+        ... "to example.com:80 (Bad hostname)</warnings>") # doctest:+IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         UscanError: Uscan failed: uscan warning: In watchfile debian/watch, reading webpage
         http://a.b/ failed: 500 Cant connect to example.com:80 (Bad hostname)
         >>> u._raise_error("<errors>uscan: Can't use --verbose if "
-        ... "you're using --dehs!</errors>")
+        ... "you're using --dehs!</errors>") # doctest:+IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         UscanError: Uscan failed: uscan: Can't use --verbose if you're using --dehs!
-        >>> u = u._raise_error('')
+        >>> u = u._raise_error('') # doctest:+IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         UscanError: Uscan failed - debug by running 'uscan --verbose'
