@@ -95,13 +95,13 @@ class ChangeLog(object):
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
-        (output, errors) = cmd.communicate(self._contents)
+        (output, errors) = cmd.communicate(bytes(self._contents, 'utf-8'))
         if cmd.returncode:
             raise ParseChangeLogError("Failed to parse changelog. "
                                       "dpkg-parsechangelog said:\n%s" % (errors, ))
         # Parse the result of dpkg-parsechangelog (which looks like
         # email headers)
-        cp = email.message_from_string(output)
+        cp = email.message_from_string(output.decode('latin1'))
         try:
             if ':' in cp['Version']:
                 cp['Epoch'], cp['NoEpoch-Version'] = cp['Version'].split(':', 1)
