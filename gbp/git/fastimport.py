@@ -46,17 +46,17 @@ class FastImport(object):
                 "Invalid argument when spawning git fast-import: %s" % err)
 
     def _do_data(self, fd, size):
-        self._out.write("data %s\n" % size)
+        self._out.write(("data %s\n" % size).encode('utf-8'))
         while True:
             data = fd.read(self._bufsize)
-            self._out.write(data)
+            self._out.write(data.encode('utf-8'))
             if len(data) != self._bufsize:
                 break
-        self._out.write("\n")
+        self._out.write("\n".encode('ascii'))
 
     def _do_file(self, filename, mode, fd, size):
         name = "/".join(filename.split('/')[1:])
-        self._out.write("M %d inline %s\n" % (mode, name))
+        self._out.write(("M %d inline %s\n" % (mode, name)).encode('utf-8'))
         self._do_data(fd, size)
 
     def add_file(self, filename, fd, size, mode=m_regular):
@@ -83,9 +83,9 @@ class FastImport(object):
         @param linktarget: the target the symlink points to
         @type linktarget: C{str}
         """
-        self._out.write("M %d inline %s\n" % (self.m_symlink, linkname))
-        self._out.write("data %s\n" % len(linktarget))
-        self._out.write("%s\n" % linktarget)
+        self._out.write(("M %d inline %s\n" % (self.m_symlink, linkname)).encode('utf-8'))
+        self._out.write(("data %s\n" % len(linktarget)).encode('utf-8'))
+        self._out.write(("%s\n" % linktarget).encode('utf-8'))
 
     def start_commit(self, branch, committer, msg):
         """
@@ -108,7 +108,7 @@ class FastImport(object):
         else:
             from_ = ''
 
-        self._out.write("""commit refs/heads/%(branch)s
+        self._out.write(("""commit refs/heads/%(branch)s
 committer %(name)s <%(email)s> %(time)s
 data %(length)s
 %(msg)s%(from)s""" %
@@ -119,13 +119,13 @@ data %(length)s
               'length': length,
               'msg': msg,
               'from': from_,
-              })
+              }).encode('utf-8'))
 
     def deleteall(self):
         """
         Issue I{deleteall} to fastimport so we start from a empty tree
         """
-        self._out.write("deleteall\n")
+        self._out.write("deleteall\n".encode('ascii'))
 
     def close(self):
         """
