@@ -48,7 +48,7 @@ Files:
 
     def setUp(self):
         with tempfile.NamedTemporaryFile(delete=False) as self.dscfile:
-            self.dscfile.write(self.content)
+            self.dscfile.write(self.content.encode('utf-8'))
 
     def tearDown(self):
         os.unlink(self.dscfile.name)
