@@ -148,13 +148,13 @@ def write_patch_file(filename, commit_info, diff):
             # Git compat: put name in quotes if special characters found
             if re.search("[,.@()\[\]\\\:;]", name):
                 name = '"%s"' % name
-            from_header = Header(unicode(name, 'utf-8'), charset, 77, 'from')
-            from_header.append(unicode('<%s>' % email))
+            from_header = Header(name, charset, 77, 'from')
+            from_header.append('<%s>' % email)
             msg['From'] = from_header
             date = commit_info['author'].datetime
             datestr = date.strftime('%a, %-d %b %Y %H:%M:%S %z')
-            msg['Date'] = Header(unicode(datestr, 'utf-8'), charset, 77, 'date')
-            msg['Subject'] = Header(unicode(commit_info['subject'], 'utf-8'),
+            msg['Date'] = Header(datestr, charset, 77, 'date')
+            msg['Subject'] = Header(commit_info['subject'],
                                     charset, 77, 'subject')
             # Write message body
             if commit_info['body']:
@@ -266,7 +266,7 @@ def get_maintainer_from_control(repo):
                               stdout=subprocess.PIPE).stdout.readlines()
 
     if len(cmdout) > 0:
-        maintainer = cmdout[0].strip()
+        maintainer = cmdout[0].decode('utf-8').strip()
         m = re.match('(?P<name>.*[^ ]) *<(?P<email>.*)>', maintainer)
         if m:
             return GitModifier(m.group('name'), m.group('email'))
