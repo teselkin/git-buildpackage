@@ -131,10 +131,13 @@ class DebianGitRepository(GitRepository):
         >>> DebianGitRepository.tag_to_version("foo/2.3.4", "foo/%(version)s")
         '2.3.4'
         >>> DebianGitRepository.tag_to_version("foo/2.3.4", "upstream/%(version)s")
+        >>> DebianGitRepository.tag_to_version("v1.0.0", "v%(version)s")
+        '1.0.0'
+        >>> DebianGitRepository.tag_to_version("vyatta/1.0-0something1", "v%(version)s")
         """
         version_re = format.replace('%(version)s',
                                     '(?P<version>[\w_%+-.]+)')
-        r = re.match(version_re, tag)
+        r = re.match(version_re + '$', tag)
         if r:
             version = r.group('version').replace('_', '~').replace('%', ':')
             return version
