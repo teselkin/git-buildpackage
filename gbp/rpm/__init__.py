@@ -186,7 +186,7 @@ class SpecFile(object):
         """Parse a filtered spec file in rpm-python"""
         skip_tags = [tag.lower() for tag in skip_tags]
         with tempfile.NamedTemporaryFile(prefix='gbp') as filtered:
-            filtered.writelines(str(line) for line in self._content
+            filtered.writelines(str(line).encode('utf-8') for line in self._content
                     if str(line).split(":")[0].strip().lower() not in skip_tags)
             filtered.flush()
             try:
