@@ -67,11 +67,15 @@ class SrcRpmFile(object):
         srpmfp.close()
         self.srpmfile = os.path.abspath(srpmfile)
 
+    def _decode(self, s):
+        if s:
+            return s.decode('utf-8')
+
     @property
     def version(self):
         """Get the (downstream) version of the RPM package"""
-        version = dict(upstreamversion = self.rpmhdr[librpm.RPMTAG_VERSION],
-                       release = self.rpmhdr[librpm.RPMTAG_RELEASE])
+        version = dict(upstreamversion = self.rpmhdr[librpm.RPMTAG_VERSION].decode('utf-8'),
+                       release = self.rpmhdr[librpm.RPMTAG_RELEASE].decode('utf-8'))
         if self.rpmhdr[librpm.RPMTAG_EPOCH] is not None:
             version['epoch'] = str(self.rpmhdr[librpm.RPMTAG_EPOCH])
         return version
@@ -79,17 +83,17 @@ class SrcRpmFile(object):
     @property
     def name(self):
         """Get the name of the RPM package"""
-        return self.rpmhdr[librpm.RPMTAG_NAME]
+        return self._decode(self.rpmhdr[librpm.RPMTAG_NAME])
 
     @property
     def upstreamversion(self):
         """Get the upstream version of the RPM package"""
-        return self.rpmhdr[librpm.RPMTAG_VERSION]
+        return self._decode(self.rpmhdr[librpm.RPMTAG_VERSION])
 
     @property
     def packager(self):
         """Get the packager of the RPM package"""
-        return self.rpmhdr[librpm.RPMTAG_PACKAGER]
+        return self._decode(self.rpmhdr[librpm.RPMTAG_PACKAGER])
 
     def unpack(self, dest_dir):
         """
@@ -159,9 +163,9 @@ class SpecFile(object):
 
         # Other initializations
         source_header = self._specinfo.packages[0].header
-        self.name = source_header[librpm.RPMTAG_NAME]
-        self.upstreamversion = source_header[librpm.RPMTAG_VERSION]
-        self.release = source_header[librpm.RPMTAG_RELEASE]
+        self.name = source_header[librpm.RPMTAG_NAME].decode('utf-8')
+        self.upstreamversion = source_header[librpm.RPMTAG_VERSION].decode('utf-8')
+        self.release = source_header[librpm.RPMTAG_RELEASE].decode('utf-8')
         # rpm-python returns epoch as 'long', convert that to string
         self.epoch = str(source_header[librpm.RPMTAG_EPOCH]) \
             if source_header[librpm.RPMTAG_EPOCH] != None else None
@@ -313,6 +317,8 @@ class SpecFile(object):
             self._tags[tagname]['value'] = tagvalue
             self._tags[tagname]['lines'].append(linerecord)
         else:
+            if tagvalue and not isinstance(tagvalue, six.string_types):
+                tagvalue = tagvalue.decode('utf-8')
             self._tags[tagname] = {'value': tagvalue, 'lines': [linerecord]}
 
         return tagname
