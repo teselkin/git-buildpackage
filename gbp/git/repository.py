@@ -1479,10 +1479,10 @@ class GitRepository(object):
         extra_env = {}
         for key, val in author.items():
             if val:
-                extra_env['GIT_AUTHOR_%s' % key.upper()] = val
+                extra_env['GIT_AUTHOR_%s' % key.upper()] = val.encode('utf-8')
         for key, val in committer.items():
             if val:
-                extra_env['GIT_COMMITTER_%s' % key.upper()] = val
+                extra_env['GIT_COMMITTER_%s' % key.upper()] = val.encode('utf-8')
 
         args = [ tree ]
         for parent in parents:
