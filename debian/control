@@ -15,7 +15,6 @@ Build-Depends:
  python3-dateutil,
  python3-mock,
  python3-nose,
- python3-nosexcover,
  python3-pkg-resources,
  python3-rpm,
  python3-six,
