@@ -33,8 +33,9 @@ class FileVfs(object):
         self._dir = dir
 
     def open(self, path, flags=None):
-        flags = flags or 'r'
-        return open(os.path.join(self._dir, path), flags)
+        # Workaround: needs to be aligne with GitVfs
+        mode = flags or 'r'
+        return open(os.path.join(self._dir, path), mode, encoding='utf-8')
 
 class DebianSourceError(Exception):
     pass
