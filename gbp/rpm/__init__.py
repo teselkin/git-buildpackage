@@ -165,7 +165,8 @@ class SpecFile(object):
         # rpm-python returns epoch as 'long', convert that to string
         self.epoch = str(source_header[librpm.RPMTAG_EPOCH]) \
             if source_header[librpm.RPMTAG_EPOCH] != None else None
-        self.packager = source_header[librpm.RPMTAG_PACKAGER]
+        self.packager = source_header[librpm.RPMTAG_PACKAGER].decode('utf-8') \
+            if source_header[librpm.RPMTAG_PACKAGER] != None else None
         self._tags = {}
         self._special_directives = defaultdict(list)
         self._gbp_tags = defaultdict(list)
