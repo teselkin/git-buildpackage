@@ -14,7 +14,7 @@ ZSH_COMPDIR = /usr/share/zsh/vendor-completions/
 PYCHECKER_ARGS=-boptparse --no-override --no-shadowbuiltin
 
 %:
-	dh $@ --with python2
+	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
@@ -24,10 +24,7 @@ ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	export GIT_COMMITTER_NAME=$$GIT_AUTHOR_NAME;	\
 	export GIT_COMMITTER_EMAIL=$$GIT_AUTHOR_EMAIL;	\
 	PYTHONPATH=.					\
-	python setup.py nosetests --with-xcoverage
-	
-	PYTHONPATH=. pychecker $(PYCHECKER_ARGS) -q \
-		gbp gbp.scripts gbp.git gbp.deb
+	python3 setup.py nosetests --with-xcoverage
 else
 	@echo "Checks disabled via DEB_BUILD_OPTIONS"
 endif
