@@ -82,7 +82,7 @@ class TestScriptDch(DebianGitTestRepo):
             options.extend(dch_options)
         ret = dch.main(options)
         self.assertEqual(ret, 0)
-        return open("debian/changelog").readlines()
+        return open("debian/changelog", encoding='utf-8').readlines()
 
 
     def test_dch_main_new_upstream_version(self):

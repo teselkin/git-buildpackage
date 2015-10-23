@@ -117,7 +117,7 @@ class ChangeLog(object):
         self._cp = cp
 
     def _read(self):
-            with open(self.filename) as f:
+            with open(self.filename, encoding='utf-8') as f:
                 self._contents = f.read()
 
     def __getitem__(self, item):
@@ -264,8 +264,8 @@ class ChangeLog(object):
         dch = Command('debchange', args, extra_env=env)
         dch.call([])
         if msg:
-            old_cl = open("debian/changelog", "r")
-            new_cl = open("debian/changelog.bak", "w")
+            old_cl = open("debian/changelog", "r", encoding='utf-8')
+            new_cl = open("debian/changelog.bak", "w", encoding='utf-8')
             for line in old_cl:
                 if line == "  * [[[insert-git-dch-commit-message-here]]]\n":
                     print("  * " + msg[0], file=new_cl)
