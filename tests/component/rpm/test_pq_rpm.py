@@ -227,7 +227,7 @@ class TestPqRpm(RpmRepoTestBase):
 
         # Apply patch
         with tempfile.NamedTemporaryFile() as tmp_patch:
-            tmp_patch.write(repo.show('master:%s' % 'my.patch'))
+            tmp_patch.write(repo.show('master:%s' % 'my.patch').encode('utf-8'))
             tmp_patch.file.flush()
             eq_(mock_pq(['apply', tmp_patch.name]), 0)
             self._check_repo_state(repo, 'patch-queue/master', branches,
@@ -235,7 +235,7 @@ class TestPqRpm(RpmRepoTestBase):
 
         # Apply another patch, now when already on pq branch
         with tempfile.NamedTemporaryFile() as tmp_patch:
-            tmp_patch.write(repo.show('master:%s' % 'my2.patch'))
+            tmp_patch.write(repo.show('master:%s' % 'my2.patch').encode('utf-8'))
             tmp_patch.file.flush()
             eq_(mock_pq(['apply', tmp_patch.name]), 0)
         self._check_repo_state(repo, 'patch-queue/master', branches,
