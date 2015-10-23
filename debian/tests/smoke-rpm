@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "Disabled until we have python3 support"
+exit 0
+
 set -e
 set -x
 
