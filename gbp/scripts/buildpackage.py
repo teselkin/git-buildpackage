@@ -26,7 +26,8 @@ import time
 import gbp.deb as du
 from gbp.command_wrappers import (Command,
                                   RunAtCommand, CommandExecFailed,
-                                  RemoveTree)
+                                  RemoveTree,
+                                  PackTarArchive, UnpackTarArchive)
 from gbp.config import (GbpOptionParserDebian, GbpOptionGroup)
 from gbp.deb.git import (GitRepositoryError, DebianGitRepository)
 from gbp.deb.source import DebianSource, DebianSourceError
@@ -303,6 +304,41 @@ def get_upstream_tree(repo, cp, options):
     if not repo.has_treeish(upstream_tree):
         raise GbpError("%s is not a valid treeish" % upstream_tree)
     return upstream_tree
+
+
+def git_archive_sdist(repo, cp, output_dir, options):
+    upstream_tree = get_upstream_tree(repo, cp, options)
+    gbp.log.info("upstream_tree = %s" % upstream_tree)
+    current_branch = repo.branch
+    gbp.log.info("current_branch = %s" % current_branch)
+    try:
+        repo.checkout(upstream_tree)
+        (tag, dev, sha1) = repo.describe(upstream_tree,
+                                         longfmt=True).rsplit('-', 3)
+        setup_py = Command('python', args=['setup.py'], capture_stdout=True)
+        setup_py.call(['--name'])
+        name = setup_py.stdout.strip()
+        setup_py.call(['--version'])
+        version = setup_py.stdout.strip()
+        gbp.log.info("version = %s" % version)
+        setup_py.call(['--fullname'])
+        fullname = setup_py.stdout.strip()
+        gbp.log.info("fullname = %s" % fullname)
+        setup_py.call(['sdist'])
+        dist_dir = os.path.join(os.getcwd(), 'dist')
+        UnpackTarArchive(archive=os.path.join(dist_dir, '%s.tar.gz' % fullname),
+                         dir=dist_dir)()
+        os.rename(os.path.join(dist_dir, fullname),
+                  os.path.join(dist_dir, "%s-%s" % (name, tag)))
+        PackTarArchive(archive=os.path.join(output_dir, "%s_%s.orig.tar.xz" % (name, tag)),
+                       dest="%s-%s" % (name, tag),
+                       dir=dist_dir)()
+    except:
+        gbp.log.error("Failed to create sdist tarball")
+    finally:
+        repo.clean(directories=True, force=True)
+        repo.force_head(upstream_tree, hard=True)
+        repo.checkout(current_branch)
 
 
 def git_archive_build_orig(repo, cp, output_dir, options):
