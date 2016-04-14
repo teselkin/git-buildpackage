@@ -304,7 +304,7 @@ def import_spec_patches(repo, options):
         dump_tree(repo, packaging_tmp, packaging_tree, with_submodules=False,
                   recursive=False)
         spec.specdir = packaging_tmp
-    in_queue = spec.patchseries()
+    in_queue = spec.patchseries(unapplied=options.unapplied)
     queue = safe_patches(in_queue)
     # Do import
     try:
@@ -371,6 +371,8 @@ switch         Switch to patch-queue branch and vice versa.""")
     parser.add_option("--force", dest="force", action="store_true",
             default=False,
             help="In case of import even import if the branch already exists")
+    parser.add_option("--unapplied", dest="unapplied", action="store_true",
+                      default=False)
     parser.add_config_file_option(option_name="color", dest="color",
             type='tristate')
     parser.add_config_file_option(option_name="color-scheme",
