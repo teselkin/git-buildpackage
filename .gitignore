@@ -2,6 +2,7 @@
 .noseids
 .coverage
 .tox/
+.idea/
 .ropeproject/
 coverage.xml
 gbp/version.py
