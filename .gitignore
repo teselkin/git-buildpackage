@@ -1,6 +1,7 @@
 *.pyc
 .noseids
 .coverage
+.idea/
 .ropeproject/
 coverage.xml
 gbp/version.py
