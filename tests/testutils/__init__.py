@@ -26,6 +26,11 @@ class OsReleaseFile(object):
 
     def __init__(self, filename):
         self._values = {}
+        self._ubuntu = {
+            'LinuxMint': {
+                'rosa': 'trusty'
+            }
+        }
 
         try:
             with open(filename, 'r') as filed:
@@ -39,6 +44,14 @@ class OsReleaseFile(object):
         except IOError as err:
             gbp.log.info('Failed to read OS release file %s: %s' %
                             (filename, err))
+
+        if self._values['DISTRIB_ID'] in self._ubuntu.keys():
+            self._values['DISTRIB_CODENAME'] = self._ubuntu.get(
+                self._values['DISTRIB_ID'], {}).get(
+                    self._values['DISTRIB_CODENAME'].lower(),
+                    self._values['DISTRIB_CODENAME'])
+            self._values['DISTRIB_ID'] = 'Ubuntu'
+
 
     def __getitem__(self, key):
         if key in self._values:
