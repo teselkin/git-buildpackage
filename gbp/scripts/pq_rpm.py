@@ -145,7 +145,8 @@ def update_patch_series(repo, spec, start, end, options):
 
     patches, commands = generate_patches(repo, start, end,
                                          spec.sourcedir, options)
-    spec.update_patches(patches, commands)
+    spec.update_patches(patches, commands,
+                        with_patch_macro=options.with_patch_macro)
     spec.write_spec_file()
     return patches
 
@@ -372,6 +373,9 @@ switch         Switch to patch-queue branch and vice versa.""")
     parser.add_option("--force", dest="force", action="store_true",
             default=False,
             help="In case of import even import if the branch already exists")
+    parser.add_option("--no-patch-macro", dest="with_patch_macro",
+                      action="store_false", default=True,
+                      help="Do not create %patch macros when exporting patches")
     parser.add_option("--unapplied", dest="unapplied", action="store_true",
                       default=False)
     parser.add_config_file_option(option_name="color", dest="color",

@@ -609,7 +609,7 @@ class SpecFile(object):
                 text += str(line)
         return text
 
-    def update_patches(self, patches, commands):
+    def update_patches(self, patches, commands, with_patch_macro=True):
         """Update spec with new patch tags and patch macros"""
         # Remove non-ignored patches
         tag_prev = None
@@ -694,19 +694,20 @@ class SpecFile(object):
                 patch = os.path.relpath(patch, self.sourcedir)
             patchnum = startnum + ind
             tag_line = self._set_tag("Patch", patchnum, patch, tag_line)
-            # Add '%patch' macro and a preceding comment line
-            comment_text = "# %s\n" % patch
-            macro_line = self._content.insert_after(macro_line, comment_text)
-            macro_line = self._set_special_macro('patch', patchnum, '-p1',
-                                                 macro_line)
-            for cmd, args in six.iteritems(cmds):
-                if cmd in ('if', 'ifarch'):
-                    self._content.insert_before(macro_line, '%%%s %s\n' %
-                                                (cmd, args))
-                    macro_line = self._content.insert_after(macro_line,
-                                                            '%endif\n')
-                    # We only support one command per patch, for now
-                    break
+            if with_patch_macro:
+                # Add '%patch' macro and a preceding comment line
+                comment_text = "# %s\n" % patch
+                macro_line = self._content.insert_after(macro_line, comment_text)
+                macro_line = self._set_special_macro('patch', patchnum, '-p1',
+                                                     macro_line)
+                for cmd, args in six.iteritems(cmds):
+                    if cmd in ('if', 'ifarch'):
+                        self._content.insert_before(macro_line, '%%%s %s\n' %
+                                                    (cmd, args))
+                        macro_line = self._content.insert_after(macro_line,
+                                                                '%endif\n')
+                        # We only support one command per patch, for now
+                        break
 
     def patchseries(self, unapplied=False, ignored=False):
         """Return non-ignored patches of the RPM as a gbp patchseries"""
