@@ -1518,7 +1518,8 @@ class GitRepository(object):
 #{ Commit Information
 
     def get_commits(self, since=None, until=None, paths=None, num=0,
-                    first_parent=False, options=None):
+                    first_parent=False, max_parents=None,
+                    min_parents=None, options=None):
         """
         Get commits from since to until touching paths
 
@@ -1543,6 +1544,8 @@ class GitRepository(object):
             args.add("%s..%s" % (since, until or 'HEAD'))
         elif until:
             args.add(until)
+        args.add_cond(min_parents, '--min-parents=%s' % min_parents)
+        args.add_cond(max_parents, '--max-parents=%s' % max_parents)
         args.add_cond(options, options)
         args.add("--")
         if isinstance(paths, six.string_types):

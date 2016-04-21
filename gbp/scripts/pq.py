@@ -24,7 +24,9 @@ import sys
 import tempfile
 import re
 from gbp.config import GbpOptionParserDebian
-from gbp.git import (GitRepositoryError, GitRepository)
+from gbp.deb.source import DebianSource, DebianSourceError
+from gbp.deb.git import (GitRepositoryError, DebianGitRepository)
+#from gbp.git import (GitRepositoryError, GitRepository)
 from gbp.command_wrappers import (GitCommand, CommandExecFailed)
 from gbp.errors import GbpError
 import gbp.log
@@ -40,6 +42,7 @@ from gbp.dch import extract_bts_cmds
 PATCH_DIR = "debian/patches/"
 SERIES_FILE = os.path.join(PATCH_DIR,"series")
 
+re_sha1 = re.compile(r'[0-9a-f]{40}$')
 
 def parse_old_style_topic(commit_info):
     """Parse 'gbp-pq-topic:' line(s) from commit info"""
@@ -72,8 +75,11 @@ def generate_patches(repo, start, end, outdir, options):
         if not repo.has_treeish(treeish):
             raise GbpError('%s not a valid tree-ish' % treeish)
 
-    # Generate patches
-    rev_list = reversed(repo.get_commits(start, end))
+    # Generate patches with --no-merges
+    # --no-merges
+    #   Do not print commits with more than one parent.
+    #   This is exactly the same as --max-parents=1.
+    rev_list = reversed(repo.get_commits(start, end, max_parents=1))
     for commit in rev_list:
         info = repo.get_commit_info(commit)
         # Parse 'gbp-pq-topic:'
@@ -171,6 +177,50 @@ def commit_patches(repo, branch, patches, options):
     return added, removed
 
 
+def get_sha1_refs(repo, name, remote='origin'):
+    """
+    @param repo:
+    @param name:
+    @param remote:
+    @return:
+
+    >>> repo = DebianGitRepository(os.path.curdir)
+    >>> ref = get_sha1_refs(repo, 'master')
+    """
+    refs = []
+
+    if re_sha1.match(name):
+        # Looks like a 40 digit SHA1
+        return name
+
+    # Check that there is a remote head with that name
+    if name.startswith('refs/heads/'):
+        ref_name = name
+    else:
+        ref_name = 'refs/heads/%s' % name
+
+    refs = repo.ls_remote(ref_name, heads=True, remote=remote)
+    if refs:
+        return refs[0]
+    else:
+        gbp.log.warn("Can't find head '%s' on remote '%s'" % (name, remote))
+
+    # Check if there is a tag
+    # ^{} suffix points to a 'real' commit instead of a tag itself
+    if name.startswith('refs/tags/'):
+        ref_name = name
+    else:
+        ref_name = 'refs/tags/%s' % name
+
+    refs = repo.ls_remote('%s^{}' % ref_name, tags=True, remote=remote)
+    if refs:
+        return refs[0]
+    else:
+        gbp.log.warn("Can't find tag '%s' on remote '%s'" % (name, remote))
+
+    return repo.rev_parse(name)
+
+
 def export_patches(repo, branch, options):
     """Export patches from the pq branch into a patch series"""
     if is_pq_branch(branch):
@@ -188,7 +238,13 @@ def export_patches(repo, branch, options):
         else:
             gbp.log.debug("%s does not exist." % PATCH_DIR)
 
-    patches = generate_patches(repo, branch, pq_branch, PATCH_DIR, options)
+    pq_start = options.pq_start if options.pq_start else branch
+    pq_branch = options.pq_branch if options.pq_branch else pq_branch
+    if options.sha1_refs:
+        pq_start = get_sha1_refs(repo, pq_start, remote=options.pq_remote)
+        pq_branch = get_sha1_refs(repo, pq_branch, remote=options.pq_remote)
+
+    patches = generate_patches(repo, pq_start, pq_branch, PATCH_DIR, options)
 
     if patches:
         with open(SERIES_FILE, 'w') as seriesfd:
@@ -354,6 +410,19 @@ def build_parser(name):
                                   dest="color_scheme")
     parser.add_config_file_option(option_name="meta-closes", dest="meta_closes")
     parser.add_config_file_option(option_name="meta-closes-bugnum", dest="meta_closes_bugnum")
+    parser.add_option('--sha1-refs', dest='sha1_refs', action='store_true', default=False,
+                      help="Use SHA1 refs instead of branch name / tag. "
+                           "Set --pq-remote if it's not 'origin' where refs are.")
+    parser.add_option('--pq-remote', dest='pq_remote', default='origin',
+                      help="Remote name where patch queue branch is located. "
+                           "This is needed for --sha1-refs to find refs correctly.")
+    parser.add_option('--pq-start', dest='pq_start', default=None,
+                      help="Where 'gbp pq export' should start exporting patches.")
+    parser.add_option('--pq-branch', dest='pq_branch', default=None,
+                      help="Branch name or last commit where 'gbp pq export' "
+                           "should finish exporting patches.")
+    parser.add_option('--upstream-tag', dest='upstream_tag', default='upstream/%(version)s',
+                      help="Template to form tag name for released sources.")
     return parser
 
 
@@ -392,10 +461,25 @@ def main(argv):
         return 1
 
     try:
-        repo = GitRepository(os.path.curdir)
+        repo = DebianGitRepository(os.path.curdir)
     except GitRepositoryError:
         gbp.log.err("%s is not a git repository" % (os.path.abspath('.')))
         return 1
+
+    try:
+        source = DebianSource('.')
+        source.is_native() # check early if this works
+    except Exception as e:
+        raise GbpError("Can't determine package type: %s" % e)
+
+    if not options.pq_start:
+        if source.changelog['Upstream-Version']:
+            options.pq_start = repo.version_to_tag(
+                options.upstream_tag,
+                source.changelog['Upstream-Version'])
+        else:
+            raise GitRepositoryError(
+                "Can't determine upstream version from changelog")
 
     try:
         current = repo.get_branch()
