@@ -561,6 +561,36 @@ class GitRepository(object):
                 return True
         return False
 
+
+    def set_tracking_branch(self, local_branch, upstream):
+        """
+        Set tracking branch for remote branch
+
+        @param local_branch: name of the local branch
+        @type local_branch: C{str}
+        @param upstream: remote/branch, for example origin/master
+        @type upstream: C{str}
+        """
+        if self.has_branch(local_branch, remote=False):
+            raise GitRepositoryError("Local branch '%s' exists!"
+                                     % local_branch)
+
+        if not self.has_branch(upstream, remote=True):
+            raise GitRepositoryError("Local branch '%s' doesn't exist!"
+                                     % upstream)
+
+        args = ['--track', local_branch, upstream]
+
+        dummy, err, ret = self._git_inout('branch',
+                                          args,
+                                          extra_env={'LC_ALL': 'C'},
+                                          capture_stderr=True)
+        if ret:
+            raise GitRepositoryError(
+                "Failed to set tracking branch '%s' for '%s': %s" %
+                (local_branch, upstream, err.strip()))
+
+
     def set_upstream_branch(self, local_branch, upstream):
         """
         Set upstream branches for local branch
