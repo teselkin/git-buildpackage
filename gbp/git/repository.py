@@ -907,6 +907,27 @@ class GitRepository(object):
             raise GitRepositoryError("revision '%s' not found" % name)
         return self.strip_sha1(sha[0], short)
 
+    def ls_remote(self, refs='', remote='origin', tags=False, heads=False):
+        """
+        Execute git ls-remote
+
+        @param refs: string to filter refs returned, optional
+        @param remote: remote name or URL to query
+        @param tags: list tags, optional
+        @param heads: list heads, optional
+        @return: list of sha1 commits
+        """
+        args = GitArgs('--quiet')
+        args.add_cond(tags, '--tags')
+        args.add_cond(heads, '--heads')
+        args.add(remote)
+        args.add_cond(refs, '%s' % refs)
+        out, ret = self._git_getoutput('ls-remote', args.args)
+        if ret:
+            raise GitRepositoryError("something went wrong")
+        return [self.strip_sha1(re.split('\s+', s, maxsplit=1)[0])
+                for s in out]
+
     @staticmethod
     def strip_sha1(sha1, length=0):
         """
