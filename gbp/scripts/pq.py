@@ -374,6 +374,32 @@ def rebase_pq(repo, branch):
     GitCommand("rebase")([base])
 
 
+def setup_pq(repo, current, options):
+    if not options.remote_url:
+        gbp.log.warn("No remote URL given, skipping setup.")
+        return
+
+    if repo.has_remote_repo(name=options.remote):
+        gbp.log.info("Found remote '%s'" % options.remote)
+    else:
+        repo.add_remote_repo(name=options.remote, url=options.remote_url,
+                             fetch=True)
+
+    pq_branch = pq_branch_name(current)
+    if repo.has_branch(pq_branch):
+        gbp.log.info("Found patch-queue branch '%s'" % pq_branch)
+        pq_base = pq_branch_base(current)
+        gbp.log.info("Switching to it's base '%s'" % pq_base)
+        repo.checkout(pq_base)
+
+        if options.force:
+            repo.delete_branch(pq_branch)
+
+    if options.remote_branch:
+        remote_branch = '%s/%s' % (options.remote, options.remote_branch)
+        repo.set_tracking_branch(pq_branch, remote_branch)
+
+
 def build_parser(name):
     try:
         parser = GbpOptionParserDebian(command=os.path.basename(name),
@@ -421,6 +447,9 @@ def build_parser(name):
                            "should finish exporting patches.")
     parser.add_option('--upstream-tag', dest='upstream_tag', default='upstream/%(version)s',
                       help="Template to form tag name for released sources.")
+    parser.add_option('--remote', dest='remote', default='upstream')
+    parser.add_option('--remote-url', dest='remote_url', default=None)
+    parser.add_option('--remote-branch', dest='remote_branch', default=None)
     return parser
 
 
@@ -446,7 +475,7 @@ def main(argv):
     else:
         action = args[1]
 
-    if args[1] in ["export", "import", "rebase", "drop", "switch"]:
+    if args[1] in ["export", "import", "rebase", "drop", "switch", "setup"]:
         pass
     elif args[1] in ["apply"]:
         if len(args) != 3:
@@ -500,6 +529,8 @@ def main(argv):
             apply_single_patch(repo, current, patch, maintainer, options.topic)
         elif action == "switch":
             switch_pq(repo, current)
+        elif action == "setup":
+            setup_pq(repo, current, options)
     except CommandExecFailed:
         retval = 1
     except (GbpError, GitRepositoryError) as err:
