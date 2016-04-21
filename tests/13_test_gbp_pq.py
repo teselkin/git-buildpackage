@@ -210,6 +210,10 @@ class TestExport(testutils.DebianGitTestRepo):
     class Options(object):
         drop = True
         patch_numbers = False
+        pq_start = None
+        pq_branch = None
+        pq_remote = 'origin'
+        sha1_refs = False
 
     def setUp(self):
         testutils.DebianGitTestRepo.setUp(self)
