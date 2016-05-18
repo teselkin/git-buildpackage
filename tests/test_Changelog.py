@@ -70,16 +70,18 @@ def test_parse_debian_only():
     '0.5.32'
     >>> cl.version == cl['Version']
     True
-    >>> cl.debian_version
+    >>> cl.upstream_version
     '0.5.32'
-    >>> cl.debian_version == cl['Debian-Version']
+    >>> cl.upstream_version == cl['Upstream-Version']
     True
     >>> cl.noepoch
     '0.5.32'
-    >>> cl.noepoch == cl['NoEpoch-Version']
+    >>> cl.noepoch == cl['Debian-Version']
+    True
+    >>> cl.debian_version == cl['Debian-Version']
     True
     >>> cl.epoch
-    >>> cl.upstream_version
+    >>> cl.debian_revision
     """
 
 def test_parse_no_eopch():
@@ -104,12 +106,16 @@ def test_parse_no_eopch():
     >>> cl.version == cl['Version']
     True
     >>> cl.debian_version
-    '1'
+    '1.0-1'
     >>> cl.debian_version == cl['Debian-Version']
+    True
+    >>> cl.debian_revision
+    '1'
+    >>> cl.debian_revision == cl['Debian-Revision']
     True
     >>> cl.noepoch
     '1.0-1'
-    >>> cl.noepoch == cl['NoEpoch-Version']
+    >>> cl.noepoch == cl['Debian-Version']
     True
     >>> cl.epoch
     >>> cl.upstream_version
@@ -139,18 +145,24 @@ def test_parse_eopch():
     '1:1.2.0-3'
     >>> cl.version == cl['Version']
     True
+    >>> cl.upstream_version
+    '1.2.0'
+    >>> cl.upstream_version == cl['Upstream-Version']
+    True
     >>> cl.debian_version
-    '3'
+    '1.2.0-3'
     >>> cl.debian_version == cl['Debian-Version']
+    True
+    >>> cl.debian_revision
+    '3'
+    >>> cl.debian_revision == cl['Debian-Revision']
     True
     >>> cl.noepoch
     '1.2.0-3'
-    >>> cl.noepoch == cl['NoEpoch-Version']
+    >>> cl.noepoch == cl['Debian-Version']
     True
     >>> cl.epoch
     '1'
-    >>> cl.upstream_version
-    '1.2.0'
     >>> cl.has_epoch()
     True
     """
@@ -248,7 +260,7 @@ def test_add_section():
     >>> version = '0.5.32ubuntu1' if os_release['DISTRIB_ID'] == 'Ubuntu' else '0.5.33'
     >>> cl.version == version
     True
-    >>> cl.debian_version == version
+    >>> cl.upstream_version == version
     True
     >>> distributions = ['UNRELEASED', os_release['DISTRIB_CODENAME'] or 'unstable']
     >>> cl['Distribution'] in distributions
@@ -295,7 +307,7 @@ def test_add_entry():
     >>> version = '0.5.32ubuntu1' if os_release['DISTRIB_ID'] == 'Ubuntu' else '0.5.33'
     >>> cl.version == version
     True
-    >>> cl.debian_version == version
+    >>> cl.upstream_version == version
     True
     >>> distributions = ['UNRELEASED', os_release['DISTRIB_CODENAME'] or 'unstable']
     >>> cl['Distribution'] in distributions

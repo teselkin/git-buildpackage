@@ -90,7 +90,23 @@ class ChangeLog(object):
         self._parse()
 
     def _parse(self):
-        """Parse a changelog based on the already read contents."""
+        """
+        Parse a changelog based on the already read contents.
+
+        According to [1] Debian version format should be the following:
+
+          [epoch:]upstream_version[-debian_revision]
+
+        This function uses the format above to split Version to the following fields:
+
+        Version: '[epoch:]upstream_version[-debian_revision]'
+        Epoch: 'epoch'
+        Debian-Version: 'upstream_version[-debian_revision]'
+        Upstream-Version: 'upstream_version' if 'debian_revision' exists, Debian-Version otherwise
+        Debian-Revision: 'debian_revision' if 'debian_revision' exists, None otherwise
+
+        [1] https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
+        """
         cmd = subprocess.Popen(['dpkg-parsechangelog', '-l-'],
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
@@ -104,13 +120,13 @@ class ChangeLog(object):
         cp = email.message_from_string(output)
         try:
             if ':' in cp['Version']:
-                cp['Epoch'], cp['NoEpoch-Version'] = cp['Version'].split(':', 1)
+                cp['Epoch'], cp['Debian-Version'] = cp['Version'].split(':', 1)
             else:
-                cp['NoEpoch-Version'] = cp['Version']
-            if '-' in cp['NoEpoch-Version']:
-                cp['Upstream-Version'], cp['Debian-Version'] = cp['NoEpoch-Version'].rsplit('-', 1)
+                cp['Debian-Version'] = cp['Version']
+            if '-' in cp['Debian-Version']:
+                cp['Upstream-Version'], cp['Debian-Revision'] = cp['Debian-Version'].rsplit('-', 1)
             else:
-                cp['Debian-Version'] = cp['NoEpoch-Version']
+                cp['Upstream-Version'] = cp['Debian-Version']
         except TypeError:
             raise ParseChangeLogError(output.split('\n')[0])
 
@@ -152,6 +168,11 @@ class ChangeLog(object):
         return self._cp['Debian-Version']
 
     @property
+    def debian_revision(self):
+        """A part of version after upstream version"""
+        return self._cp['Debian-Revision']
+
+    @property
     def epoch(self):
         """The package's epoch"""
         return self._cp['Epoch']
@@ -159,7 +180,7 @@ class ChangeLog(object):
     @property
     def noepoch(self):
         """The version string without the epoch"""
-        return self._cp['NoEpoch-Version']
+        return self._cp['Debian-Version']
 
     def has_epoch(self):
         """
